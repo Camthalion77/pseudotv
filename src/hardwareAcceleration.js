@@ -66,4 +66,31 @@ function inspect(ffmpegPath = 'ffmpeg', runner = spawnSync) {
   }
 }
 
-module.exports = { BACKENDS, inspect, parseEncoders, parseHwaccels }
+// An optional, real encoding smoke test; never changes saved settings.
+// Uses a synthetic one-second video, no Plex media or credentials.
+const SMOKE_ARGS = Object.freeze({
+  software: ['-c:v', 'libx264'],
+  vaapi: ['-vaapi_device', '/dev/dri/renderD128', '-vf', 'format=nv12,hwupload', '-c:v', 'h264_vaapi'],
+  qsv: ['-c:v', 'h264_qsv'],
+  nvenc: ['-c:v', 'h264_nvenc'],
+  videotoolbox: ['-c:v', 'h264_videotoolbox'],
+  amf: ['-c:v', 'h264_amf']
+})
+
+function testEncoder(ffmpegPath = 'ffmpeg', backend = 'software', runner = spawnSync) {
+  if (!Object.prototype.hasOwnProperty.call(SMOKE_ARGS, backend)) {
+    return { backend, supported: false, error: 'Unknown backend' }
+  }
+  const args = ['-hide_banner', '-nostdin', '-loglevel', 'error',
+    '-f', 'lavfi', '-i', 'color=c=black:s=128x128:r=12',
+    '-frames:v', '12', ...SMOKE_ARGS[backend], '-f', 'null', '-']
+  const result = runner(ffmpegPath, args, {
+    encoding: 'utf8', timeout: 12000, maxBuffer: 64 * 1024, windowsHide: true
+  })
+  // Report only short, local FFmpeg diagnostics (never command lines / Plex tokens).
+  const error = result.error ? result.error.message :
+    result.status === 0 ? null : String(result.stderr || 'Encoder test failed').slice(-700)
+  return { backend, supported: !result.error && result.status === 0, error }
+}
+
+module.exports = { BACKENDS, inspect, parseEncoders, parseHwaccels, testEncoder }
