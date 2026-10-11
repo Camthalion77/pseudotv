@@ -1,0 +1,12 @@
+'use strict'
+const assert = require('assert')
+const { selectBackend, ORDER } = require('./src/hardwarePolicy')
+assert.strictEqual(selectBackend().backend, 'software')
+assert.strictEqual(selectBackend({mode:'auto',results:{nvenc:true}}).encoder, 'h264_nvenc')
+assert.strictEqual(selectBackend({mode:'nvenc',results:{nvenc:false}}).backend, 'software')
+assert.strictEqual(selectBackend({mode:'nvenc',results:{nvenc:true},filters:{subtitleBurnIn:true}}).backend,'software')
+assert.strictEqual(selectBackend({mode:'auto',results:{vaapi:true},filters:{deinterlace:true}}).backend,'software')
+assert.strictEqual(selectBackend({mode:'auto',results:{}}).backend, 'software')
+assert.strictEqual(selectBackend({mode:'bad-backend',results:{'bad-backend':true}}).backend,'software')
+assert.strictEqual(ORDER.length, 5)
+console.log('Stage 3 portable encoder selection policy tests passed')
