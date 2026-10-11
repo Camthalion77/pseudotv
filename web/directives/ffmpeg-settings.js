@@ -7,20 +7,24 @@
         },
         link: function (scope, element, attrs) {
             pseudotv.getFfmpegSettings().then((settings) => {
-                scope.settings = settings
+                scope.settings = scope.normalizeHardwareMode(settings)
                 if (typeof scope.settings.args === 'undefined')
                     scope.createArgString()
             })
+            scope.normalizeHardwareMode = (settings) => {
+                if (settings && !settings.hardwareMode) settings.hardwareMode = 'off'
+                return settings
+            }
             scope.updateSettings = (settings) => {
                 pseudotv.updateFfmpegSettings(settings).then((_settings) => {
-                    scope.settings = _settings
+                    scope.settings = scope.normalizeHardwareMode(_settings)
                     if (typeof scope.settings.args === 'undefined')
                         scope.createArgString()
                 })
             }
             scope.resetSettings = (settings) => {
                 pseudotv.resetFfmpegSettings(settings).then((_settings) => {
-                    scope.settings = _settings
+                    scope.settings = scope.normalizeHardwareMode(_settings)
                     if (typeof scope.settings.args === 'undefined')
                         scope.createArgString()
                 })

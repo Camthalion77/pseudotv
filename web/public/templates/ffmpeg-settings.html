@@ -8,6 +8,20 @@
             Reset Options
         </button>
     </h5>
+    <div class="card mb-3"><div class="card-body">
+      <h6>Hardware Acceleration (Experimental)</h6>
+      <label for="hardwareMode">Preferred acceleration backend</label>
+      <select id="hardwareMode" class="form-control form-control-sm" ng-model="settings.hardwareMode">
+        <option value="off">Off - current FFmpeg settings</option>
+        <option value="auto">Auto detect</option>
+        <option value="qsv">Intel Quick Sync</option>
+        <option value="nvenc">NVIDIA NVENC</option>
+        <option value="vaapi">VA-API (Linux)</option>
+        <option value="videotoolbox">Apple VideoToolbox</option>
+        <option value="amf">AMD AMF</option>
+      </select>
+      <small class="form-text text-muted">Preference only. Hardware encoding is not yet enabled; existing FFmpeg arguments are untouched.</small>
+    </div></div>
     <h6>FFMPEG Executable Path (eg: C:\ffmpeg\bin\ffmpeg.exe || /usr/bin/ffmpeg)</h6>
     <input type="text" class="form-control form-control-sm" ng-model="settings.ffmpegPath"/>
     <hr/>

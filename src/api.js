@@ -61,12 +61,14 @@ function api(db, xmltvInterval) {
         updateXmltv()
     })
 
+    const HARDWARE_MODES = ['off','auto','qsv','nvenc','vaapi','videotoolbox','amf']
     // FFMPEG SETTINGS
     router.get('/api/ffmpeg-settings', (req, res) => {
         let ffmpeg = db['ffmpeg-settings'].find()[0]
         res.send(ffmpeg)
     })
     router.put('/api/ffmpeg-settings', (req, res) => {
+        if (req.body.hardwareMode !== undefined && !HARDWARE_MODES.includes(req.body.hardwareMode)) return res.status(400).json({error:'Invalid hardware mode'})
         db['ffmpeg-settings'].update({ _id: req.body._id }, req.body)
         let ffmpeg = db['ffmpeg-settings'].find()[0]
         res.send(ffmpeg)
@@ -74,6 +76,7 @@ function api(db, xmltvInterval) {
     router.post('/api/ffmpeg-settings', (req, res) => { // RESET
         db['ffmpeg-settings'].update({ _id: req.body._id }, {
             ffmpegPath: req.body.ffmpegPath,
+            hardwareMode: 'off',
             offset: 0,
             threads: 4,
             videoEncoder: 'libx264',
