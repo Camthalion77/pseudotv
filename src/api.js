@@ -1,10 +1,18 @@
 
 const express = require('express')
 const fs = require('fs')
+const hardwareAcceleration = require('./hardwareAcceleration')
 
 module.exports = { router: api }
 function api(db, xmltvInterval) {
     let router = express.Router()
+
+    // Read-only, cross-platform FFmpeg capability discovery. Never changes settings.
+    router.get('/api/hardware-acceleration', (req, res) => {
+        const ffmpeg = db['ffmpeg-settings'].find()[0]
+        const ffmpegPath = ffmpeg && ffmpeg.ffmpegPath ? ffmpeg.ffmpegPath : 'ffmpeg'
+        res.json(hardwareAcceleration.inspect(ffmpegPath))
+    })
 
     // Plex Servers
     router.get('/api/plex-servers', (req, res) => {
