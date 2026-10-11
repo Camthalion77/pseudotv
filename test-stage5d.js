@@ -1,0 +1,10 @@
+'use strict'
+const fs = require('fs')
+const assert = require('assert')
+const s = fs.readFileSync('src/ffmpeg.js','utf8')
+assert(s.includes("process.env.PSEUDOTV_EXPERIMENTAL_VAAPI === '1'"))
+assert(s.includes("this.opts.hardwareMode === 'vaapi'"))
+assert(s.includes("'[vaapi_cpu];[vaapi_cpu]format=nv12,hwupload[v]'"))
+assert(s.includes("'-rc_mode', 'CQP', '-qp', '23'"))
+assert(s.includes("console.warn('VA-API requested but this FFmpeg template is unsupported; keeping software')"))
+console.log('Stage 5D source guard checks passed; actual playback not yet tested.')

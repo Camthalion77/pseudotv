@@ -161,6 +161,45 @@ class FFMPEG extends events.EventEmitter {
         if (this.opts.hardwareMode && this.opts.hardwareMode !== 'off' && process.env.DEBUG)
             console.log(`Hardware preflight: ${hardwareAssessment.reason}; existing FFmpeg configuration preserved`)
 
+        // Experimental VA-API encoding. Both opt-ins are required: do not alter
+        // any established installation or custom FFmpeg template by default.
+        // The GPU test is deliberately performed outside live playback.
+        if (process.env.PSEUDOTV_EXPERIMENTAL_VAAPI === '1' &&
+            this.opts.hardwareMode === 'vaapi') {
+            const graphIndex = tmpargs.indexOf('-filter_complex')
+            const graph = graphIndex === -1 ? '' : tmpargs[graphIndex + 1]
+            const encoderIndex = tmpargs.findIndex((arg, i) =>
+                (arg === '-c:v' || arg === '-codec:v') && tmpargs[i + 1] === 'libx264')
+            if (graphIndex !== -1 && typeof graph === 'string' &&
+                graph.endsWith('[v]') && encoderIndex !== -1) {
+                // Final CPU filters (including subtitles/overlays) stay intact.
+                // Upload NV12 frames only after all CPU processing is complete.
+                tmpargs[graphIndex + 1] = graph.slice(0, -3) +
+                    '[vaapi_cpu];[vaapi_cpu]format=nv12,hwupload[v]'
+                tmpargs[encoderIndex + 1] = 'h264_vaapi'
+                // VA-API CQP works on the verified Intel UHD 630; legacy
+                // x264 preset and bitrate-control options are incompatible.
+                const removeWithValue = new Set([
+                    '-preset', '-b:v', '-b:v:0', '-maxrate:v',
+                    '-bufsize:v', '-minrate:v', '-crf', '-qp'
+                ])
+                for (let i = tmpargs.length - 2; i >= 0; i--) {
+                    if (removeWithValue.has(tmpargs[i])) tmpargs.splice(i, 2)
+                }
+                const firstInput = tmpargs.indexOf('-i')
+                if (firstInput !== -1) {
+                    tmpargs.splice(firstInput, 0, '-vaapi_device',
+                        process.env.PSEUDOTV_VAAPI_DEVICE || '/dev/dri/renderD128')
+                    const encoderAt = tmpargs.indexOf('h264_vaapi')
+                    tmpargs.splice(encoderAt + 1, 0,
+                        '-rc_mode', 'CQP', '-qp', '23')
+                    console.log('Experimental VA-API CQP 23 encoder enabled')
+                }
+            } else {
+                console.warn('VA-API requested but this FFmpeg template is unsupported; keeping software')
+            }
+        }
+
         this.offset += lineupItem.duration / 1000
         this.ffmpeg = spawn(this.ffmpegPath, tmpargs)
         this.ffmpeg.stdout.on('data', (chunk) => {
