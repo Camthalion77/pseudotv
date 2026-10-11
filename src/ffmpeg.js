@@ -1,6 +1,7 @@
 const spawn = require('child_process').spawn
 const events = require('events')
 const fs = require('fs')
+const { assessPlayback } = require('./hardwareRuntime')
 
 class FFMPEG extends events.EventEmitter {
     constructor(opts, channel) {
@@ -144,6 +145,21 @@ class FFMPEG extends events.EventEmitter {
 
         if (this.channel.icon !== '' && this.channel.overlayIcon && lineupItem.type === 'program') // Add the channel icon to ffmpeg input if enabled
             tmpargs.splice(vidStream - 1, 0, '-i', this.channel.icon)
+
+        // Per-program guard before the real FFmpeg process starts.
+        // This does NOT replace encoders yet: current filter_complex yields CPU frames.
+        // Only verified end-to-end GPU pipelines may change tmpargs in a future stage.
+        const hardwareAssessment = assessPlayback({
+            mode: this.opts.hardwareMode || 'off',
+            args: tmpargs,
+            filters: {
+                subtitleBurnIn: sub !== null && lineupItem.type !== 'commercial',
+                iconOverlay: this.channel.icon !== '' && this.channel.overlayIcon && lineupItem.type === 'program',
+                deinterlace: deinterlace !== 'null'
+            }
+        })
+        if (this.opts.hardwareMode && this.opts.hardwareMode !== 'off' && process.env.DEBUG)
+            console.log(`Hardware preflight: ${hardwareAssessment.reason}; existing FFmpeg configuration preserved`)
 
         this.offset += lineupItem.duration / 1000
         this.ffmpeg = spawn(this.ffmpegPath, tmpargs)
