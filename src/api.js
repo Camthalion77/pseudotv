@@ -14,6 +14,12 @@ function api(db, xmltvInterval) {
         res.json(hardwareAcceleration.inspect(ffmpegPath))
     })
 
+    router.get('/api/hardware-acceleration', (req, res) => {
+        const settings = db['ffmpeg-settings'].find()[0]
+        const path = settings && settings.ffmpegPath ? settings.ffmpegPath : 'ffmpeg'
+        res.json(hardwareAcceleration.inspect(path))
+    })
+
     // Plex Servers
     router.get('/api/plex-servers', (req, res) => {
         let servers = db['plex-servers'].find()
