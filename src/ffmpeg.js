@@ -184,8 +184,15 @@ class FFMPEG extends events.EventEmitter {
                 const size = sizeIndex >= 0 ? tmpargs[sizeIndex + 1] : null
                 const validSize = typeof size === 'string' && /^[1-9][0-9]*x[1-9][0-9]*$/.test(size)
                 const scaleFilter = validSize ? 'scale=' + size.replace('x', ':') + ',' : ''
-                tmpargs[graphIndex + 1] = graph.slice(0, -3) +
-                    '[vaapi_cpu];[vaapi_cpu]' + scaleFilter + 'format=nv12,hwupload[v]'
+                // Burn subtitles onto FINAL-sized CPU frames: scaling after ass
+                // makes subtitle font sizes dependent on source resolution.
+                // Preserve the old path for programs without text subtitles.
+                const textSubs = validSize && graph.includes(',ass=')
+                const cpuGraph = textSubs
+                    ? graph.replace(',ass=', ',' + scaleFilter + 'ass=')
+                    : graph
+                tmpargs[graphIndex + 1] = cpuGraph.slice(0, -3) +
+                    '[vaapi_cpu];[vaapi_cpu]' + (textSubs ? '' : scaleFilter) + 'format=nv12,hwupload[v]'
                 tmpargs[encoderIndex + 1] = 'h264_vaapi'
                 // Scaling happens before hwupload, not on GPU frames.
                 for (let i = tmpargs.length - 2; i >= 0; i--) {
