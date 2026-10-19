@@ -7,6 +7,8 @@ function restyle(text, options = {}) {
         ? options.subtitleFontSize : 26
     const margin = Number.isInteger(options.subtitleMargin) && options.subtitleMargin >= 8 && options.subtitleMargin <= 80
         ? options.subtitleMargin : 28
+    const outline = Number.isInteger(options.subtitleOutline) && options.subtitleOutline >= 1 && options.subtitleOutline <= 5
+        ? options.subtitleOutline : 3
     let section = ''
     let fields = null
     let foundStyles = false
@@ -30,8 +32,11 @@ function restyle(text, options = {}) {
                 const set = (name, value) => { const i = fields.indexOf(name); if (i >= 0 && i < values.length) values[i] = String(value) }
                 set('fontname', 'DejaVu Sans')
                 set('fontsize', size)
-                set('outline', 2)
+                set('outline', outline)
                 set('shadow', 1)
+                // Ensure the outline and shadow are opaque black on bright scenes.
+                set('outlinecolour', '&H00000000')
+                set('backcolour', '&H00000000')
                 set('alignment', 2)
                 set('marginv', margin)
                 return 'Style: ' + values.join(',')

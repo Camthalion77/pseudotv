@@ -90,7 +90,7 @@ app.listen(process.env.PORT, () => {
 
 function initDB(db) {
     if (db['language-settings'].find().length === 0)
-        db['language-settings'].save({ enabled: false, audio: 'default', subtitles: 'off', fallback: 'off', forced: true, subtitleFontSize: 26, subtitleMargin: 28 })
+        db['language-settings'].save({ enabled: false, audio: 'default', subtitles: 'off', fallback: 'off', forced: true, subtitleFontSize: 26, subtitleMargin: 28, subtitleOutline: 3 })
     let ffmpegSettings = db['ffmpeg-settings'].find()
     if (!fs.existsSync(process.env.DATABASE + '/font.ttf')) {
         let data = fs.readFileSync(path.resolve(path.join(__dirname, 'resources/font.ttf')))

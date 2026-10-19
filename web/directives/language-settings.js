@@ -6,6 +6,7 @@ module.exports = function (pseudotv) {
             pseudotv.getLanguageSettings().then(settings => {
                 if (settings.subtitleFontSize === undefined) settings.subtitleFontSize = 26
                 if (settings.subtitleMargin === undefined) settings.subtitleMargin = 28
+                if (settings.subtitleOutline === undefined) settings.subtitleOutline = 3
                 scope.settings = settings
             })
             scope.save = function () {

@@ -32,10 +32,13 @@ function api(db, xmltvInterval) {
             return res.status(400).json({ error: 'Invalid subtitle font size' })
         if (input.subtitleMargin !== undefined && (!Number.isInteger(input.subtitleMargin) || input.subtitleMargin < 8 || input.subtitleMargin > 80))
             return res.status(400).json({ error: 'Invalid subtitle margin' })
+        if (input.subtitleOutline !== undefined && (!Number.isInteger(input.subtitleOutline) || input.subtitleOutline < 1 || input.subtitleOutline > 5))
+            return res.status(400).json({ error: 'Invalid subtitle outline' })
         const next = { _id: current._id, enabled: input.enabled, audio: input.audio.toLowerCase(),
             subtitles: input.subtitles.toLowerCase(), fallback: input.fallback.toLowerCase(), forced: input.forced,
             subtitleFontSize: input.subtitleFontSize === undefined ? 26 : input.subtitleFontSize,
-            subtitleMargin: input.subtitleMargin === undefined ? 28 : input.subtitleMargin }
+            subtitleMargin: input.subtitleMargin === undefined ? (current.subtitleMargin === undefined ? 28 : current.subtitleMargin) : input.subtitleMargin,
+            subtitleOutline: input.subtitleOutline === undefined ? (current.subtitleOutline === undefined ? 3 : current.subtitleOutline) : input.subtitleOutline }
         db['language-settings'].update({ _id: current._id }, next)
         res.json(db['language-settings'].find()[0])
     })
