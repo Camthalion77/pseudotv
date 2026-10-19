@@ -127,7 +127,7 @@ class FFMPEG extends events.EventEmitter {
                 console.log("PGS SUBS (embeded)")
                 tmpargs.splice(vidStream - 1, 0, "-filter_complex", `${iconOverlay}[v2];[v2]${deinterlace}[v1];[v1][0:${sub.index}]overlay[v]`)
             }
-        } else if (sub.codec === 'srt' || sub.codec === 'ass') {
+        } else if (sub.codec === 'srt' || sub.codec === 'ass' || sub.codec === 'mov_text') {
             tmpargs[vidStream] = '[v]'
             if (typeof sub.index === 'undefined') {
                 console.log("SRT SUBS (external)")
