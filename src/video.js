@@ -69,6 +69,7 @@ function video(db) {
 
         let ffmpeg = new FFMPEG(ffmpegSettings, channel)
         // Read current settings for every program, including mid-stream changes.
+        ffmpeg.languageSettings = () => db['language-settings'].find()[0] || {}
         ffmpeg.languageResolver = (item) => language.apply(item, db['language-settings'].find()[0])  // Set the transcoder options
 
         ffmpeg.on('data', (data) => { res.write(data) })

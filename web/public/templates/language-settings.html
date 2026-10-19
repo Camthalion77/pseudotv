@@ -3,14 +3,37 @@
   <p>Apply your preferred audio and subtitle language to all existing and future channels. Changes take effect on the next program.</p>
   <div ng-if="settings">
     <label><input type="checkbox" ng-model="settings.enabled"> Enable global language preferences</label>
-    <div class="form-group"><label>Audio language (ISO code)</label>
-      <input class="form-control" type="text" ng-model="settings.audio" placeholder="default / eng / ell" maxlength="6">
-      <small>default = Plex selection; e.g. eng, ell, deu, fra</small></div>
-    <div class="form-group"><label>Subtitle language (ISO code)</label>
-      <input class="form-control" type="text" ng-model="settings.subtitles" placeholder="off / ell / eng" maxlength="6">
-      <small>off = none; default = Plex selection</small></div>
+    <div class="form-group"><label>Preferred audio language</label>
+      <select class="form-control" ng-model="settings.audio">
+        <option value="default">Plex default</option>
+        <option value="ell">Greek (Ελληνικά)</option><option value="eng">English</option>
+        <option value="deu">German (Deutsch)</option><option value="fra">French (Français)</option>
+        <option value="spa">Spanish (Español)</option><option value="ita">Italian (Italiano)</option>
+        <option value="por">Portuguese</option><option value="jpn">Japanese (日本語)</option>
+        <option value="rus">Russian (Русский)</option><option value="zho">Chinese (中文)</option>
+      </select></div>
+    <div class="form-group"><label>Preferred subtitle language</label>
+      <select class="form-control" ng-model="settings.subtitles">
+        <option value="off">Off (no subtitles)</option><option value="default">Plex default</option>
+        <option value="ell">Greek (Ελληνικά)</option><option value="eng">English</option>
+        <option value="deu">German (Deutsch)</option><option value="fra">French (Français)</option>
+        <option value="spa">Spanish (Español)</option><option value="ita">Italian (Italiano)</option>
+        <option value="por">Portuguese</option><option value="jpn">Japanese (日本語)</option>
+        <option value="rus">Russian (Русский)</option><option value="zho">Chinese (中文)</option>
+      </select></div>
     <div class="form-group"><label>Subtitle fallback</label>
-      <input class="form-control" type="text" ng-model="settings.fallback" placeholder="off / eng" maxlength="6"></div>
+      <select class="form-control" ng-model="settings.fallback">
+        <option value="off">Off (none)</option>
+        <option value="ell">Greek (Ελληνικά)</option><option value="eng">English</option>
+        <option value="deu">German (Deutsch)</option><option value="fra">French (Français)</option>
+        <option value="spa">Spanish (Español)</option><option value="ita">Italian (Italiano)</option>
+        <option value="por">Portuguese</option><option value="jpn">Japanese (日本語)</option>
+        <option value="rus">Russian (Русский)</option><option value="zho">Chinese (中文)</option>
+      </select></div>
+    <div class="form-group"><label>Subtitle size (16–48 px at 1280×720)</label>
+      <input class="form-control" type="number" min="16" max="48" step="1" ng-model="settings.subtitleFontSize"></div>
+    <div class="form-group"><label>Distance from bottom edge (8–80 px)</label>
+      <input class="form-control" type="number" min="8" max="80" step="1" ng-model="settings.subtitleMargin"></div>
     <label><input type="checkbox" ng-model="settings.forced"> Use available forced subtitles when preferred language is missing</label>
     <div><button class="btn btn-primary" ng-click="save()">Save preferences</button></div>
     <p class="text-success" ng-if="saved">Saved. Applies to the next program.</p>

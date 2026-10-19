@@ -1,6 +1,7 @@
 const spawn = require('child_process').spawn
 const events = require('events')
 const fs = require('fs')
+const { normalizeAss } = require('./subtitleStyle')
 const { assessPlayback } = require('./hardwareRuntime')
 
 class FFMPEG extends events.EventEmitter {
@@ -43,7 +44,11 @@ class FFMPEG extends events.EventEmitter {
             exe.on('close', (code) => {
                 if (code === 0) {
                     if (process.env.DEBUG) console.log('Successfully generated .ass subtitles')
-                    resolve()
+                    try {
+                        const style = this.languageSettings ? this.languageSettings() : {}
+                        normalizeAss(output, style)
+                        resolve()
+                    } catch (err) { reject(err) }
                 } else {
                     console.log('Failed generating .ass subtitles.')
                     reject()

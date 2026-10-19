@@ -28,8 +28,14 @@ function api(db, xmltvInterval) {
         if (typeof input.enabled !== 'boolean' || typeof input.forced !== 'boolean' ||
             !language(input.audio) || !language(input.subtitles) || !language(input.fallback))
             return res.status(400).json({ error: 'Invalid language settings' })
+        if (input.subtitleFontSize !== undefined && (!Number.isInteger(input.subtitleFontSize) || input.subtitleFontSize < 16 || input.subtitleFontSize > 48))
+            return res.status(400).json({ error: 'Invalid subtitle font size' })
+        if (input.subtitleMargin !== undefined && (!Number.isInteger(input.subtitleMargin) || input.subtitleMargin < 8 || input.subtitleMargin > 80))
+            return res.status(400).json({ error: 'Invalid subtitle margin' })
         const next = { _id: current._id, enabled: input.enabled, audio: input.audio.toLowerCase(),
-            subtitles: input.subtitles.toLowerCase(), fallback: input.fallback.toLowerCase(), forced: input.forced }
+            subtitles: input.subtitles.toLowerCase(), fallback: input.fallback.toLowerCase(), forced: input.forced,
+            subtitleFontSize: input.subtitleFontSize === undefined ? 26 : input.subtitleFontSize,
+            subtitleMargin: input.subtitleMargin === undefined ? 28 : input.subtitleMargin }
         db['language-settings'].update({ _id: current._id }, next)
         res.json(db['language-settings'].find()[0])
     })

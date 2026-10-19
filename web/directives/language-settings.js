@@ -3,7 +3,11 @@ module.exports = function (pseudotv) {
         restrict: 'E', templateUrl: 'templates/language-settings.html', replace: true, scope: {},
         link: function (scope) {
             scope.saved = false
-            pseudotv.getLanguageSettings().then(settings => { scope.settings = settings })
+            pseudotv.getLanguageSettings().then(settings => {
+                if (settings.subtitleFontSize === undefined) settings.subtitleFontSize = 26
+                if (settings.subtitleMargin === undefined) settings.subtitleMargin = 28
+                scope.settings = settings
+            })
             scope.save = function () {
                 scope.saved = false
                 pseudotv.updateLanguageSettings(scope.settings).then(settings => {
