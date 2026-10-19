@@ -11,6 +11,7 @@ app.service('pseudotv',         require('./services/pseudotv'))
 
 app.directive('plexSettings',   require('./directives/plex-settings'))
 app.directive('ffmpegSettings', require('./directives/ffmpeg-settings'))
+app.directive('languageSettings', require('./directives/language-settings'))
 app.directive('xmltvSettings',  require('./directives/xmltv-settings'))
 app.directive('hdhrSettings',   require('./directives/hdhr-settings'))
 app.directive('plexLibrary',    require('./directives/plex-library'))

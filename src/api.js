@@ -16,6 +16,24 @@ function api(db, xmltvInterval) {
 
 
 
+    // Global language preferences. Validated, non-destructive updates.
+    router.get('/api/language-settings', (req, res) => {
+        res.json(db['language-settings'].find()[0] || {})
+    })
+    router.put('/api/language-settings', (req, res) => {
+        const current = db['language-settings'].find()[0]
+        if (!current) return res.status(500).json({ error: 'Language settings unavailable' })
+        const input = req.body || {}
+        const language = (v) => typeof v === 'string' && (/^[a-z]{2,3}(?:-[a-z]{2})?$/i.test(v) || ['off','default'].includes(v))
+        if (typeof input.enabled !== 'boolean' || typeof input.forced !== 'boolean' ||
+            !language(input.audio) || !language(input.subtitles) || !language(input.fallback))
+            return res.status(400).json({ error: 'Invalid language settings' })
+        const next = { _id: current._id, enabled: input.enabled, audio: input.audio.toLowerCase(),
+            subtitles: input.subtitles.toLowerCase(), fallback: input.fallback.toLowerCase(), forced: input.forced }
+        db['language-settings'].update({ _id: current._id }, next)
+        res.json(db['language-settings'].find()[0])
+    })
+
     // Plex Servers
     router.get('/api/plex-servers', (req, res) => {
         let servers = db['plex-servers'].find()

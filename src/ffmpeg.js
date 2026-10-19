@@ -52,6 +52,7 @@ class FFMPEG extends events.EventEmitter {
         })
     }
     async spawn(lineupItem) {
+        if (this.languageResolver) lineupItem = this.languageResolver(lineupItem)
         let videoIndex = lineupItem.opts.videoIndex
         let audioIndex = lineupItem.opts.audioIndex
         let subtitleIndex = lineupItem.opts.subtitleIndex

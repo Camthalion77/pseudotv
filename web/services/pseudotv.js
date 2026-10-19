@@ -19,6 +19,8 @@ module.exports = function ($http) {
                 headers: { 'Content-Type': 'application/json; charset=utf-8' }
             }).then((d) => { return d.data })
         },
+        getLanguageSettings: () => $http.get('/api/language-settings').then(d => d.data),
+        updateLanguageSettings: (settings) => $http.put('/api/language-settings', settings).then(d => d.data),
         getFfmpegSettings: () => {
             return $http.get('/api/ffmpeg-settings').then((d) => { return d.data })
         },

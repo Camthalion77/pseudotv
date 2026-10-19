@@ -16,6 +16,9 @@
             </span>
         </li>
         <li class="nav-item">
+            <span class="nav-link btn btn-link {{ selected === 'language' ? 'active' : ''}}" ng-click="selected = 'language'">Languages</span>
+        </li>
+        <li class="nav-item">
             <span class="nav-link btn btn-link {{ selected === 'hdhr' ? 'active' : ''}}" ng-click="selected = 'hdhr'">
                 HDHR
             </span>
@@ -26,4 +29,5 @@
     <ffmpeg-settings ng-if="selected == 'ffmpeg'"></ffmpeg-settings>
     <xmltv-settings ng-if="selected == 'xmltv'"></xmltv-settings>
     <hdhr-settings ng-if="selected == 'hdhr'"></hdhr-settings>
+    <language-settings ng-if="selected == 'language'"></language-settings>
 </div>

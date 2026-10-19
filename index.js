@@ -27,7 +27,7 @@ if (!fs.existsSync(process.env.DATABASE))
 if(!fs.existsSync(path.join(process.env.DATABASE, 'images')))
     fs.mkdirSync(path.join(process.env.DATABASE, 'images'))
 
-db.connect(process.env.DATABASE, ['channels', 'plex-servers', 'ffmpeg-settings', 'xmltv-settings', 'hdhr-settings'])
+db.connect(process.env.DATABASE, ['channels', 'plex-servers', 'ffmpeg-settings', 'xmltv-settings', 'hdhr-settings', 'language-settings'])
 
 initDB(db)
 
@@ -89,6 +89,8 @@ app.listen(process.env.PORT, () => {
 })
 
 function initDB(db) {
+    if (db['language-settings'].find().length === 0)
+        db['language-settings'].save({ enabled: false, audio: 'default', subtitles: 'off', fallback: 'off', forced: true })
     let ffmpegSettings = db['ffmpeg-settings'].find()
     if (!fs.existsSync(process.env.DATABASE + '/font.ttf')) {
         let data = fs.readFileSync(path.resolve(path.join(__dirname, 'resources/font.ttf')))

@@ -3,6 +3,7 @@ const helperFuncs = require('./helperFuncs')
 const FFMPEG = require('./ffmpeg')
 const FFMPEG_TEXT = require('./ffmpegText')
 const fs = require('fs')
+const language = require('./languageSelection')
 
 module.exports = { router: video }
 
@@ -66,7 +67,9 @@ function video(db) {
 
         console.log(`\r\nStream starting. Channel: ${channel.number} (${channel.name})`)
 
-        let ffmpeg = new FFMPEG(ffmpegSettings, channel)  // Set the transcoder options
+        let ffmpeg = new FFMPEG(ffmpegSettings, channel)
+        // Read current settings for every program, including mid-stream changes.
+        ffmpeg.languageResolver = (item) => language.apply(item, db['language-settings'].find()[0])  // Set the transcoder options
 
         ffmpeg.on('data', (data) => { res.write(data) })
 
